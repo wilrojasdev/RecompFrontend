@@ -34,15 +34,35 @@
 #include "util/file.h"
 
 static std::atomic_bool cursor_enabled = true;
+static std::atomic_bool online_session = false;
+
+void recompui::set_online_session(bool online) {
+    online_session.store(online);
+}
+
+bool recompui::is_online_session() {
+    return online_session.load();
+}
+
+static std::function<void()> quit_to_launcher_callback = nullptr;
+
+void recompui::set_quit_to_launcher_callback(std::function<void()> callback) {
+    quit_to_launcher_callback = std::move(callback);
+}
 
 void recompui::open_quit_game_prompt() {
+    bool online = online_session.load();
     recompui::open_choice_prompt(
-        "Are you sure you want to quit?",
-        "Any progress since your last save will be lost.",
-        "Quit",
+        online ? "Leave Session?" : "Are you sure you want to quit?",
+        online ? "You will be disconnected from the game." : "Any progress since your last save will be lost.",
+        online ? "Disconnect" : "Quit",
         "Cancel",
-        []() {
-            ultramodern::quit();
+        [online]() {
+            if (online && quit_to_launcher_callback) {
+                quit_to_launcher_callback();
+            } else {
+                ultramodern::quit();
+            }
         },
         []() {},
         recompui::ButtonStyle::Danger,

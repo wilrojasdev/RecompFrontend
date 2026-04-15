@@ -95,6 +95,9 @@ namespace recompui {
     void apply_color_hack();
     void get_window_size(int& width, int& height);
     void open_quit_game_prompt();
+    void set_online_session(bool online);
+    bool is_online_session();
+    void set_quit_to_launcher_callback(std::function<void()> callback);
     bool get_cursor_visible();
     void set_cursor_visible(bool visible);
     void update_supported_options();
