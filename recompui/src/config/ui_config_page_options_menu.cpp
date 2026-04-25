@@ -1,4 +1,5 @@
 #include "ui_config_page_options_menu.h"
+#include "recompui/i18n.h"
 
 
 namespace recompui {
@@ -138,7 +139,7 @@ void ConfigPageOptionsMenu::render_confirmation_footer() {
     ContextId context = recompui::get_current_context();
     footer->set_as_navigation_container(NavigationType::Horizontal);
 
-    apply_button = context.create_element<Button>(footer->get_right(), "Apply", ButtonStyle::Secondary);
+    apply_button = context.create_element<Button>(footer->get_right(), recompui::tr("recompui.btn.apply", "Apply"), ButtonStyle::Secondary);
     apply_button->set_enabled(false);
     apply_button->set_as_primary_focus();
     apply_button->add_pressed_callback([this]() {

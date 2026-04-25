@@ -2,6 +2,7 @@
 #include "ui_utils.h"
 #include "recompui/recompui.h"
 #include "recompui/config.h"
+#include "recompui/i18n.h"
 #include "util/file.h"
 #include "renderer.h"
 #include "elements/ui_modal.h"
@@ -10,6 +11,7 @@
 
 #include "librecomp/mods.hpp"
 
+#include <algorithm>
 #include <string>
 
 #ifdef WIN32
@@ -284,6 +286,15 @@ void ModMenu::refresh_mods(bool scan_mods) {
         recomp::mods::scan_mods();
     }
     mod_details = recomp::mods::get_all_mod_details(game_mod_id);
+    // Hide bundled mods (e.g. language packs that ship with the launcher).
+    // They are managed automatically by the locale selector and shouldn't
+    // appear as user-toggleable entries here.
+    mod_details.erase(
+        std::remove_if(mod_details.begin(), mod_details.end(),
+            [](const recomp::mods::ModDetails& d) {
+                return recomp::mods::is_embedded_mod(d.mod_id);
+            }),
+        mod_details.end());
     create_mod_list();
 }
 
@@ -703,7 +714,7 @@ ModMenu::ModMenu(ResourceId rid, Element *parent) : Element(rid, parent) {
         body_empty_container->set_display(Display::None);
         {
             context.create_element<Element>(body_empty_container);
-            context.create_element<Label>(body_empty_container, "You have no mods. Go get some!", LabelStyle::Large);
+            context.create_element<Label>(body_empty_container, recompui::tr("recompui.mods.empty", "You have no mods. Go get some!"), LabelStyle::Large);
             context.create_element<Element>(body_empty_container);
         } // body_empty_container
 
@@ -720,7 +731,7 @@ ModMenu::ModMenu(ResourceId rid, Element *parent) : Element(rid, parent) {
         footer_container->set_border_bottom_right_radius(16.0f);
         {
             Button* configure_button = mod_details_panel->get_configure_button();
-            install_mods_button = context.create_element<Button>(footer_container, "Install Mods", recompui::ButtonStyle::Primary);
+            install_mods_button = context.create_element<Button>(footer_container, recompui::tr("recompui.mods.install_mods", "Install Mods"), recompui::ButtonStyle::Primary);
             install_mods_button->add_pressed_callback([this](){ open_install_dialog(); });
 
             Element* footer_spacer = context.create_element<Element>(footer_container);
@@ -729,7 +740,7 @@ ModMenu::ModMenu(ResourceId rid, Element *parent) : Element(rid, parent) {
             refresh_button = context.create_element<IconButton>(footer_container, "icons/Reset.svg", recompui::ButtonStyle::Secondary, recompui::IconButtonSize::XLarge);
             refresh_button->add_pressed_callback([this](){ refresh_mods(true); });
 
-            mods_folder_button = context.create_element<Button>(footer_container, "Open Mods Folder", recompui::ButtonStyle::Tertiary);
+            mods_folder_button = context.create_element<Button>(footer_container, recompui::tr("recompui.mods.open_folder", "Open Mods Folder"), recompui::ButtonStyle::Tertiary);
             mods_folder_button->add_pressed_callback([this](){ open_mods_folder(); });
         } // footer_container
     } // this

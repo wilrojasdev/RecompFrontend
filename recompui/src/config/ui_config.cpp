@@ -1,4 +1,5 @@
 #include "recompui/config.h"
+#include "recompui/i18n.h"
 #include "elements/ui_modal.h"
 #include "elements/ui_icon_button.h"
 #include "ui_config_page_options_menu.h"
@@ -71,10 +72,10 @@ namespace recompui {
                 recomp::config::Config &config = config::get_config(id);
                 if (config.requires_confirmation && config.is_dirty()) {
                     recompui::open_choice_prompt(
-                        name + " options have unapplied changes.",
-                        "Would you like to apply or discard the changes?",
-                        "Apply",
-                        "Discard",
+                        name + " " + recompui::tr("recompui.tab.unapplied_suffix", "options have unapplied changes."),
+                        recompui::tr("recompui.prompt.unsaved.body", "Would you like to apply or discard the changes?"),
+                        recompui::tr("recompui.btn.apply", "Apply"),
+                        recompui::tr("recompui.btn.discard", "Discard"),
                         [id, close_context]() {
                             config::get_config(id).save_config();
                             if (close_context == TabCloseContext::ModalClose) {

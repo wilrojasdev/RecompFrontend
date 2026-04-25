@@ -18,6 +18,7 @@
 
 #include "recompui/recompui.h"
 #include "recompui/config.h"
+#include "recompui/i18n.h"
 #include "recompui/program_config.h"
 #include "recompinput/recompinput.h"
 #include "recompinput/profiles.h"
@@ -53,10 +54,16 @@ void recompui::set_quit_to_launcher_callback(std::function<void()> callback) {
 void recompui::open_quit_game_prompt() {
     bool online = online_session.load();
     recompui::open_choice_prompt(
-        online ? "Leave Session?" : "Are you sure you want to quit?",
-        online ? "You will be disconnected from the game." : "Any progress since your last save will be lost.",
-        online ? "Disconnect" : "Quit",
-        "Cancel",
+        online
+            ? recompui::tr("recompui.quit.title_online", "Leave Session?")
+            : recompui::tr("recompui.quit.title_offline", "Are you sure you want to quit?"),
+        online
+            ? recompui::tr("recompui.quit.body_online", "You will be disconnected from the game.")
+            : recompui::tr("recompui.quit.body_offline", "Any progress since your last save will be lost."),
+        online
+            ? recompui::tr("recompui.quit.btn_disconnect", "Disconnect")
+            : recompui::tr("recompui.quit.btn_quit", "Quit"),
+        recompui::tr("recompui.btn.cancel", "Cancel"),
         [online]() {
             if (online && quit_to_launcher_callback) {
                 quit_to_launcher_callback();
@@ -1044,7 +1051,10 @@ void recompui::drop_files(const std::list<std::filesystem::path> &file_list) {
     recompui::hide_all_contexts();
     recompui::config::open();
 
-    recompui::open_notification("Installing Mods", "Please Wait");
+    recompui::open_notification(
+        recompui::tr("recompui.mods.installing_title", "Installing Mods"),
+        recompui::tr("recompui.mods.installing_body", "Please Wait")
+    );
     // TODO: Needs a progress callback and a prompt for every mod that needs to be confirmed to be overwritten.
     // TODO: Run this on a background thread and use the callbacks to advance the state instead of blocking.
     ModInstaller::Result result;
@@ -1059,7 +1069,13 @@ void recompui::drop_files(const std::list<std::filesystem::path> &file_list) {
                 return lhs.empty() ? rhs : lhs + '\n' + rhs;
             });
 
-        recompui::open_info_prompt("Error Installing Mods", error_label, "OK", {}, recompui::ButtonStyle::Tertiary);
+        recompui::open_info_prompt(
+            recompui::tr("recompui.mods.error_install", "Error Installing Mods"),
+            error_label,
+            recompui::tr("recompui.btn.ok", "OK"),
+            {},
+            recompui::ButtonStyle::Tertiary
+        );
         std::vector<std::string> dummy_error_messages{};
         ModInstaller::cancel_mod_installation(result, dummy_error_messages);
         return;
@@ -1127,10 +1143,11 @@ void recompui::drop_files(const std::list<std::filesystem::path> &file_list) {
             });
 
         // open prompt where confirm finishes the mod installation with the overwritten files
-        recompui::open_choice_prompt("Overwrite Mods?",
+        recompui::open_choice_prompt(
+            recompui::tr("recompui.mods.overwrite_title", "Overwrite Mods?"),
             prompt_text,
-            "Overwrite",
-            "Cancel",
+            recompui::tr("recompui.mods.overwrite_btn", "Overwrite"),
+            recompui::tr("recompui.btn.cancel", "Cancel"),
             [result]() {
                 std::vector<std::string> error_messages{};
                 recomp::mods::close_mods();

@@ -8,6 +8,7 @@
 #include "elements/ui_select.h"
 #include "recompinput/profiles.h"
 #include "recompui/config.h"
+#include "recompui/i18n.h"
 
 namespace recompui {
 
@@ -297,7 +298,7 @@ void ConfigPageControls::render_header() {
 
         if (multiplayer_view_mappings) {
             if (header_elements.right.go_back_button == nullptr) {
-                header_elements.right.go_back_button = context.create_element<Button>(header_right, "Go back", ButtonStyle::Tertiary);
+                header_elements.right.go_back_button = context.create_element<Button>(header_right, recompui::tr("recompui.controls.go_back", "Go back"), ButtonStyle::Tertiary);
                 header_elements.right.go_back_button->add_pressed_callback([this]() {
                     this->multiplayer_view_mappings = false;
                     this->queue_selected_player_profile_edit_focus = true;
@@ -310,7 +311,7 @@ void ConfigPageControls::render_header() {
             show_or_hide_if_exists(header_elements.right.assign_players_button, false);
         } else {
             if (header_elements.right.assign_players_button == nullptr) {
-                header_elements.right.assign_players_button = context.create_element<Button>(header_right, "Assign players", ButtonStyle::Primary);
+                header_elements.right.assign_players_button = context.create_element<Button>(header_right, recompui::tr("recompui.controls.assign_players", "Assign players"), ButtonStyle::Primary);
                 header_elements.right.assign_players_button->set_debug_id("AssignPlayersButton");
                 header_elements.right.assign_players_button->add_pressed_callback([]() {
                     if (!recompinput::players::has_enough_players_assigned()) {
@@ -485,7 +486,7 @@ void ConfigPageControls::render_footer() {
     {
         auto footer_right = footer->get_right();
         footer_right->clear_children();
-        auto reset_to_defaults_button = context.create_element<Button>(footer_right, "Reset to defaults", ButtonStyle::Warning);
+        auto reset_to_defaults_button = context.create_element<Button>(footer_right, recompui::tr("recompui.controls.reset_defaults", "Reset to defaults"), ButtonStyle::Warning);
         reset_to_defaults_button->add_pressed_callback([this]() {
             recompinput::profiles::reset_profile_bindings(this->selected_profile_index, this->get_player_input_device());
             this->update_control_mappings();

@@ -1,5 +1,6 @@
 #include "librecomp/config.hpp"
 #include "recompui/config.h"
+#include "recompui/i18n.h"
 #include "util/steam_deck.h"
 
 namespace recompui {
@@ -14,16 +15,18 @@ namespace config {
         return config::get_config(config::general::id);
     }
 
-    using EnumOptionVector = const std::vector<recomp::config::ConfigOptionEnumOption>;
+    using EnumOptionVector = std::vector<recomp::config::ConfigOptionEnumOption>;
     enum class BackgroundInputMode {
         Off,
         On,
         OptionCount
     };
-    static EnumOptionVector background_input_options = {
-        {BackgroundInputMode::Off, "Off"},
-        {BackgroundInputMode::On, "On"},
-    };
+    static EnumOptionVector make_background_input_options() {
+        return EnumOptionVector{
+            {BackgroundInputMode::Off, "Off", recompui::tr("opt.off", "Off")},
+            {BackgroundInputMode::On,  "On",  recompui::tr("opt.on",  "On")},
+        };
+    }
 
     template <typename T = uint32_t>
     T get_general_config_enum_value(const std::string& option_id) {
@@ -90,9 +93,10 @@ namespace config {
         if (options.has_rumble_strength) {
             config.add_percent_number_option(
                 general::options::rumble_strength,
-                "Rumble Strength",
-                "Controls the strength of rumble when using a controller that supports it. "
-                "<b>Setting this to zero will disable rumble.</b>",
+                recompui::tr("recompui.general.rumble_strength.title", "Rumble Strength"),
+                recompui::tr("recompui.general.rumble_strength.desc",
+                    "Controls the strength of rumble when using a controller that supports it. "
+                    "<b>Setting this to zero will disable rumble.</b>"),
                 25.0
             );
         }
@@ -124,18 +128,19 @@ namespace config {
 
         config.add_percent_number_option(
             general::options::joystick_deadzone,
-            "Joystick Deadzone",
-            "Applies a deadzone to joystick inputs.",
+            recompui::tr("recompui.general.joystick_deadzone.title", "Joystick Deadzone"),
+            recompui::tr("recompui.general.joystick_deadzone.desc", "Applies a deadzone to joystick inputs."),
             5.0
         );
 
         config.add_enum_option(
             general::options::background_input_mode,
-            "Background Input Mode",
-            "Allows the game to read controller input when out of focus."
-            "<br/>"
-            "<b>This setting does not affect keyboard input.</b>",
-            background_input_options,
+            recompui::tr("recompui.general.bg_input.title", "Background Input Mode"),
+            recompui::tr("recompui.general.bg_input.desc",
+                "Allows the game to read controller input when out of focus."
+                "<br/>"
+                "<b>This setting does not affect keyboard input.</b>"),
+            make_background_input_options(),
             BackgroundInputMode::On
         );
 

@@ -1,5 +1,6 @@
 #include "librecomp/config.hpp"
 #include "recompui/config.h"
+#include "recompui/i18n.h"
 
 namespace recompui {
 
@@ -28,8 +29,8 @@ namespace config {
 
         config.add_percent_number_option(
             sound::options::main_volume,
-            "Main Volume",
-            "Controls the main volume of the game.",
+            recompui::tr("recompui.sound.main_volume.title", "Main Volume"),
+            recompui::tr("recompui.sound.main_volume.desc", "Controls the main volume of the game."),
             100.0
         );
 

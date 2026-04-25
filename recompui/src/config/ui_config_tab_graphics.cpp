@@ -1,5 +1,6 @@
 #include "librecomp/config.hpp"
 #include "recompui/config.h"
+#include "recompui/i18n.h"
 #include "recompui/renderer.h"
 #include "util/steam_deck.h"
 
@@ -18,28 +19,34 @@ namespace recompui {
             return is_steam_deck() ? ultramodern::renderer::WindowMode::Fullscreen : ultramodern::renderer::WindowMode::Windowed;
         }
 
-        using EnumOptionVector = const std::vector<recomp::config::ConfigOptionEnumOption>;
-        static EnumOptionVector resolution_options = {
-            {ultramodern::renderer::Resolution::Original, "Original", "Original"},
-            {ultramodern::renderer::Resolution::Original2x, "Original2x", "Original 2x"},
-            {ultramodern::renderer::Resolution::Auto, "Auto", "Auto"},
-        };
+        using EnumOptionVector = std::vector<recomp::config::ConfigOptionEnumOption>;
+        static EnumOptionVector make_resolution_options() {
+            return {
+                {ultramodern::renderer::Resolution::Original,   "Original",   recompui::tr("recompui.opt.original",    "Original")},
+                {ultramodern::renderer::Resolution::Original2x, "Original2x", recompui::tr("recompui.opt.original_2x", "Original 2x")},
+                {ultramodern::renderer::Resolution::Auto,       "Auto",       recompui::tr("recompui.opt.auto",        "Auto")},
+            };
+        }
 
         enum class DownsamplingOption {
             Off = 0,
             X2 = 2,
             X4 = 4,
         };
-        static EnumOptionVector downsampling_options = {
-            {DownsamplingOption::Off, "Off"},
-            {DownsamplingOption::X2, "2x"},
-            {DownsamplingOption::X4, "4x"},
-        };
+        static EnumOptionVector make_downsampling_options() {
+            return {
+                {DownsamplingOption::Off, "Off", recompui::tr("opt.off",     "Off")},
+                {DownsamplingOption::X2,  "2x",  recompui::tr("recompui.opt.x2", "2x")},
+                {DownsamplingOption::X4,  "4x",  recompui::tr("recompui.opt.x4", "4x")},
+            };
+        }
 
-        static EnumOptionVector window_mode_options = {
-            {ultramodern::renderer::WindowMode::Windowed, "Windowed"},
-            {ultramodern::renderer::WindowMode::Fullscreen, "Fullscreen"}
-        };
+        static EnumOptionVector make_window_mode_options() {
+            return {
+                {ultramodern::renderer::WindowMode::Windowed,   "Windowed",   recompui::tr("recompui.opt.windowed",   "Windowed")},
+                {ultramodern::renderer::WindowMode::Fullscreen, "Fullscreen", recompui::tr("recompui.opt.fullscreen", "Fullscreen")},
+            };
+        }
 
         #if defined(_WIN32)
         #define ALLOW_D3D12
@@ -64,24 +71,28 @@ namespace recompui {
         #endif
         };
 
-        static EnumOptionVector aspect_ratio_options = {
-            {ultramodern::renderer::AspectRatio::Original, "Original"},
-            {ultramodern::renderer::AspectRatio::Expand, "Expand"},
-            // {ultramodern::renderer::AspectRatio::Manual, "Manual"},
-        };
+        static EnumOptionVector make_aspect_ratio_options() {
+            return {
+                {ultramodern::renderer::AspectRatio::Original, "Original", recompui::tr("recompui.opt.original", "Original")},
+                {ultramodern::renderer::AspectRatio::Expand,   "Expand",   recompui::tr("recompui.opt.expand",   "Expand")},
+            };
+        }
 
-        static EnumOptionVector antialiasing_options = {
-            {ultramodern::renderer::Antialiasing::None, "None"},
-            {ultramodern::renderer::Antialiasing::MSAA2X, "MSAA2X", "2X"},
-            {ultramodern::renderer::Antialiasing::MSAA4X, "MSAA4X", "4X"},
-            // {ultramodern::renderer::Antialiasing::MSAA8X, "MSAA8X"},
-        };
+        static EnumOptionVector make_antialiasing_options() {
+            return {
+                {ultramodern::renderer::Antialiasing::None,   "None",   recompui::tr("opt.invert.none", "None")},
+                {ultramodern::renderer::Antialiasing::MSAA2X, "MSAA2X", "2X"},
+                {ultramodern::renderer::Antialiasing::MSAA4X, "MSAA4X", "4X"},
+            };
+        }
 
-        static EnumOptionVector refresh_rate_options = {
-            {ultramodern::renderer::RefreshRate::Original, "Original"},
-            {ultramodern::renderer::RefreshRate::Display, "Display"},
-            {ultramodern::renderer::RefreshRate::Manual, "Manual"},
-        };
+        static EnumOptionVector make_refresh_rate_options() {
+            return {
+                {ultramodern::renderer::RefreshRate::Original, "Original", recompui::tr("recompui.opt.original", "Original")},
+                {ultramodern::renderer::RefreshRate::Display,  "Display",  recompui::tr("recompui.opt.display",  "Display")},
+                {ultramodern::renderer::RefreshRate::Manual,   "Manual",   recompui::tr("recompui.opt.manual",   "Manual")},
+            };
+        }
 
         static EnumOptionVector hpfb_options = {
             {ultramodern::renderer::HighPrecisionFramebuffer::Auto, "Auto"},
@@ -89,11 +100,13 @@ namespace recompui {
             {ultramodern::renderer::HighPrecisionFramebuffer::Off, "Off"},
         };
 
-        static EnumOptionVector hud_ratio_mode_options = {
-            {ultramodern::renderer::HUDRatioMode::Original, "Original"},
-            {ultramodern::renderer::HUDRatioMode::Clamp16x9, "Clamp16x9", "16:9"},
-            {ultramodern::renderer::HUDRatioMode::Full, "Expand"},
-        };
+        static EnumOptionVector make_hud_ratio_mode_options() {
+            return {
+                {ultramodern::renderer::HUDRatioMode::Original,  "Original",  recompui::tr("recompui.opt.original", "Original")},
+                {ultramodern::renderer::HUDRatioMode::Clamp16x9, "Clamp16x9", "16:9"},
+                {ultramodern::renderer::HUDRatioMode::Full,      "Expand",    recompui::tr("recompui.opt.expand", "Expand")},
+            };
+        }
 
         static const std::string get_downsampling_details(ultramodern::renderer::Resolution res_option, DownsamplingOption ds_option) {
             switch (res_option) {
@@ -234,9 +247,10 @@ namespace recompui {
 
             config.add_enum_option(
                 graphics::options::res_option,
-                "Resolution",
-                "Sets the output resolution of the game. <recomp-color primary>Original</recomp-color> matches the game's original 240p resolution. <recomp-color primary>Original 2x</recomp-color> will render at 480p. <recomp-color primary>Auto</recomp-color> will scale based on the game window's resolution.",
-                resolution_options,
+                recompui::tr("recompui.graphics.resolution.title", "Resolution"),
+                recompui::tr("recompui.graphics.resolution.desc",
+                    "Sets the output resolution of the game. <recomp-color primary>Original</recomp-color> matches the game's original 240p resolution. <recomp-color primary>Original 2x</recomp-color> will render at 480p. <recomp-color primary>Auto</recomp-color> will scale based on the game window's resolution."),
+                make_resolution_options(),
                 ultramodern::renderer::Resolution::Auto
             );
             {
@@ -251,12 +265,13 @@ namespace recompui {
 
             config.add_enum_option(
                 graphics::options::ds_option,
-                "Downsampling Quality",
-                "Renders at a higher resolution and scales it down to the output resolution for increased quality. Only available in <recomp-color primary>Original</recomp-color> and <recomp-color primary>Original 2x</recomp-color> resolution."
-                "<br />"
-                "<br />"
-                "Note: <recomp-color primary>4x</recomp-color> downsampling quality at <recomp-color primary>Original 2x</recomp-color> resolution may cause performance issues on low end devices, as it will cause the game to render <recomp-color warning>at almost 4k internal resolution</recomp-color>.",
-                downsampling_options,
+                recompui::tr("recompui.graphics.downsampling.title", "Downsampling Quality"),
+                recompui::tr("recompui.graphics.downsampling.desc",
+                    "Renders at a higher resolution and scales it down to the output resolution for increased quality. Only available in <recomp-color primary>Original</recomp-color> and <recomp-color primary>Original 2x</recomp-color> resolution."
+                    "<br />"
+                    "<br />"
+                    "Note: <recomp-color primary>4x</recomp-color> downsampling quality at <recomp-color primary>Original 2x</recomp-color> resolution may cause performance issues on low end devices, as it will cause the game to render <recomp-color warning>at almost 4k internal resolution</recomp-color>."),
+                make_downsampling_options(),
                 DownsamplingOption::Off
             );
             {
@@ -285,25 +300,27 @@ namespace recompui {
 
             config.add_enum_option(
                 graphics::options::ar_option,
-                "Aspect Ratio",
-                "Sets the horizontal aspect ratio. <recomp-color primary>Original</recomp-color> uses the game's original 4:3 aspect ratio. <recomp-color primary>Expand</recomp-color> will adjust to match the game window's aspect ratio.",
-                aspect_ratio_options,
+                recompui::tr("recompui.graphics.aspect_ratio.title", "Aspect Ratio"),
+                recompui::tr("recompui.graphics.aspect_ratio.desc",
+                    "Sets the horizontal aspect ratio. <recomp-color primary>Original</recomp-color> uses the game's original 4:3 aspect ratio. <recomp-color primary>Expand</recomp-color> will adjust to match the game window's aspect ratio."),
+                make_aspect_ratio_options(),
                 ultramodern::renderer::AspectRatio::Expand
             );
 
             config.add_enum_option(
                 graphics::options::wm_option,
-                "Window Mode",
-                "Sets whether the game should display <recomp-color primary>Windowed</recomp-color> or <recomp-color primary>Fullscreen</recomp-color>. You can also use <recomp-color primary>F11</recomp-color> or <recomp-color primary>Alt + Enter</recomp-color> to toggle this option.",
-                window_mode_options,
+                recompui::tr("recompui.graphics.window_mode.title", "Window Mode"),
+                recompui::tr("recompui.graphics.window_mode.desc",
+                    "Sets whether the game should display <recomp-color primary>Windowed</recomp-color> or <recomp-color primary>Fullscreen</recomp-color>. You can also use <recomp-color primary>F11</recomp-color> or <recomp-color primary>Alt + Enter</recomp-color> to toggle this option."),
+                make_window_mode_options(),
                 wm_default()
             );
 
             config.add_enum_option(
                 graphics::options::rr_option,
-                "Framerate",
+                recompui::tr("recompui.graphics.framerate.title", "Framerate"),
                 get_framerate_text(60),
-                refresh_rate_options,
+                make_refresh_rate_options(),
                 ultramodern::renderer::RefreshRate::Display
             );
 
@@ -324,20 +341,22 @@ namespace recompui {
 
             config.add_enum_option(
                 graphics::options::msaa_option,
-                "MS Anti-Aliasing",
-                "Sets the multisample anti-aliasing (MSAA) quality level. This reduces jagged edges in the final image at the expense of rendering performance."
-                "<br />"
-                "<br />"
-                "<recomp-color primary>Note: This option won't be available if your GPU does not support programmable MSAA sample positions, as it is currently required to avoid rendering glitches.</recomp-color>",
-                antialiasing_options,
+                recompui::tr("recompui.graphics.msaa.title", "MS Anti-Aliasing"),
+                recompui::tr("recompui.graphics.msaa.desc",
+                    "Sets the multisample anti-aliasing (MSAA) quality level. This reduces jagged edges in the final image at the expense of rendering performance."
+                    "<br />"
+                    "<br />"
+                    "<recomp-color primary>Note: This option won't be available if your GPU does not support programmable MSAA sample positions, as it is currently required to avoid rendering glitches.</recomp-color>"),
+                make_antialiasing_options(),
                 ultramodern::renderer::Antialiasing::MSAA2X
             );
 
             config.add_enum_option(
                 graphics::options::hr_option,
-                "HUD Placement",
-                "Adjusts the placement of HUD elements to fit the selected aspect ratio. <recomp-color primary>Expand</recomp-color> will use the aspect ratio of the game's output window.",
-                hud_ratio_mode_options,
+                recompui::tr("recompui.graphics.hud_placement.title", "HUD Placement"),
+                recompui::tr("recompui.graphics.hud_placement.desc",
+                    "Adjusts the placement of HUD elements to fit the selected aspect ratio. <recomp-color primary>Expand</recomp-color> will use the aspect ratio of the game's output window."),
+                make_hud_ratio_mode_options(),
                 ultramodern::renderer::HUDRatioMode::Clamp16x9
             );
 
