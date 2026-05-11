@@ -42,6 +42,16 @@ target_include_directories(recompinput PRIVATE
 
 if (WIN32)
     target_include_directories(recompinput PRIVATE ${sdl2_SOURCE_DIR}/include)
+elseif (ANDROID)
+    # Android has no upstream SDL2; we ship a header-only shim in
+    # include/sdl_shim/ that declares the SDL surface recompinput/recompui
+    # consume, backed by recompinput::platform::* + sdl_shim.cpp + the
+    # banjo_android::touch event ingestion path. This include dir MUST come
+    # before any system SDL include path so that #include "SDL.h" resolves
+    # to our shim.
+    target_include_directories(recompinput PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/sdl_shim
+    )
 elseif (APPLE OR CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_include_directories(recompinput PRIVATE ${SDL2_INCLUDE_DIRS})
 endif()

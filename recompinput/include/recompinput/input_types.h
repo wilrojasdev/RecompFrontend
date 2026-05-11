@@ -4,7 +4,7 @@
 #include <string>
 #include <array>
 #include "json/json.hpp"
-#include "SDL.h"
+#include "recompinput/event.h"
 
 namespace recompinput {
     #define DEFINE_N64_BUTTON_INPUTS() \
@@ -57,16 +57,17 @@ namespace recompinput {
     };
     #undef DEFINE_INPUT
 
-    // What type of source an input comes from (SDL_Scancode, SDL_GameControllerButton, SDL_GameControllerAxis, SDL_BUTTON, etc.)
+    // What type of source an input comes from (Scancode, GamepadButton,
+    // GamepadAxis, MouseButton, etc.)
     enum class InputType {
         None = 0, // Using zero for None ensures that default initialized InputFields are unbound.
         Keyboard,
         Mouse,
         ControllerDigital,
-        ControllerAnalog // Axis input_id values are the SDL value + 1
+        ControllerAnalog // Axis input_id values are the GamepadAxis value + 1
     };
 
-    
+
     // A single input. Combines the source of the input (see InputType) and a specific key/button/axis.
     struct InputField {
         InputType input_type;
@@ -75,15 +76,15 @@ namespace recompinput {
         std::string to_string() const;
         auto operator<=>(const InputField& rhs) const = default;
 
-        static InputField keyboard(SDL_Scancode key) {
+        static InputField keyboard(Scancode key) {
             return InputField{ InputType::Keyboard, static_cast<int32_t>(key) };
         }
 
-        static InputField controller_digital(SDL_GameControllerButton button) {
+        static InputField controller_digital(GamepadButton button) {
             return InputField{ InputType::ControllerDigital, static_cast<int32_t>(button) };
         }
 
-        static InputField controller_analog(SDL_GameControllerAxis axis, bool positive = true) {
+        static InputField controller_analog(GamepadAxis axis, bool positive = true) {
             return InputField{ InputType::ControllerAnalog, positive ? (static_cast<int32_t>(axis) + 1) : -(static_cast<int32_t>(axis) + 1) };
         }
 

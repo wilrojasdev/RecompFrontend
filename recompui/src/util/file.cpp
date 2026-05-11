@@ -114,7 +114,16 @@ namespace recompui {
         return recomp_dir;
     }
 
+    static std::filesystem::path s_program_path_override{};
+
+    void file::set_program_path_override(const std::filesystem::path& path) {
+        s_program_path_override = path;
+    }
+
     std::filesystem::path file::get_program_path() {
+        if (!s_program_path_override.empty()) {
+            return s_program_path_override;
+        }
 #if defined(__APPLE__)
         return file::apple::get_bundle_resource_directory();
 #elif defined(__linux__) && defined(RECOMP_FLATPAK)

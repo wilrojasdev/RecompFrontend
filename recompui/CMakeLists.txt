@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(recompui LANGUAGES C CXX)
 
-if (WIN32)
+if (WIN32 OR ANDROID)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/lib/")
 endif()
 
@@ -103,6 +103,13 @@ target_include_directories(recompui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include
 
 if (WIN32)
     target_include_directories(recompui PRIVATE ${sdl2_SOURCE_DIR}/include)
+elseif (ANDROID)
+    # Android has no upstream SDL2; pick up the header-only shim that
+    # recompinput owns. PUBLIC on recompinput already, but recompui doesn't
+    # link recompinput, so we pull the include path directly.
+    target_include_directories(recompui PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../recompinput/include/sdl_shim
+    )
 elseif (APPLE OR CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_include_directories(recompui PRIVATE ${SDL2_INCLUDE_DIRS})
 endif()
