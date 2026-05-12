@@ -60,6 +60,13 @@ unsigned int DPC_TMEM_REG = 0;
 
 void dummy_check_interrupts() {}
 
+#if defined(__ANDROID__)
+// Defined in BanjoRecompiled (android_render_context.cpp). Invoked after each
+// RT64 present so the Android Java layer can dismiss the post-"Start game"
+// shader splash on the first real frame.
+extern "C" void (*recompui_android_after_present_hook)(void);
+#endif
+
 RT64::UserConfiguration::Antialiasing compute_max_supported_aa(plume::RenderSampleCounts bits) {
     if (bits & plume::RenderSampleCount::Bits::COUNT_2) {
         if (bits & plume::RenderSampleCount::Bits::COUNT_4) {
@@ -358,6 +365,11 @@ void renderer::RT64Context::send_dummy_workload(uint32_t fb_address) {
 void renderer::RT64Context::update_screen() {
     check_refresh_rate_changes();
     app->updateScreen();
+#if defined(__ANDROID__)
+    if (recompui_android_after_present_hook) {
+        recompui_android_after_present_hook();
+    }
+#endif
 }
 
 void renderer::RT64Context::shutdown() {
